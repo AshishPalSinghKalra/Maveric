@@ -1,0 +1,233 @@
+########################################################
+## ASHISH - Python Assignment:
+########################################################
+1. ##Calculate net amount:
+
+net_amount=0
+trans_type=''
+while trans_type=='' or trans_type=='D' or trans_type =='W':  
+ trans_type=input("Enter D or W based on transaction type. Press Q to quit")
+ if trans_type=='D':
+  deposit=int(input("Enter deposit amount"))
+  net_amount=net_amount+deposit
+
+ elif trans_type=='W':
+  withdrawl=int(input("Enter withdrawl amount"))
+  net_amount=net_amount-withdrawl
+
+ else print("Wrong value entered")
+ break
+
+print(f"Net amount={net_amount}")
+       
+##############################################################################################################
+
+2. ## Program that prompts the user to input number of calls and calculate the monthly telephone bills:
+
+nbr_of_calls=int(input("Enter number of calls"))
+if nbr_of_calls <=100:
+ bill=200
+elif nbr_of_calls >100 and nbr_of_calls <=150:
+ bill=200+(0.6*(nbr_of_calls-100))
+elif nbr_of_calls >150 and nbr_of_calls <=200:
+ bill=230+(0.5*(nbr_of_calls-150))
+else: 
+ bill=255+(0.4*(nbr_of_calls-200))
+
+print(f"Bill amount={bill}")
+
+##############################################################################################################
+
+3. ## Sum all the numbers in a list:
+
+L=input("Enter a list L")
+sum=0
+for s in L:
+ sum+=s
+print (f"Sum of all numbers is {sum}")
+
+##############################################################################################################
+
+4. ## Python program to reverse a string:
+
+full_string=input("Enter a string")
+length_string=len(full_string)
+counter=length_string-1
+for i in full_string:
+ reverse_string[counter]=i
+ counter-=1
+print (f"Reverse string is {reverse_string})
+
+
+## Alternate Method:
+full_string=input("Enter a string")
+reverse_string=full_string[::-1]
+print (f"Reverse string is {reverse_string})
+
+##############################################################################################################
+
+5. ## Calculate the number of uppercase letters and lower case letters:
+
+full_string=input("Enter a string")
+lower_count=0
+upper_count=0
+
+for i in full_string:
+ if i.upper()==i:
+  upper_count+=1
+ if i.lower()==i:
+  lower_count+=1
+
+print (f"No. of Upper case characters is {upper_count}")
+print (f"No. of Lower case characters is {lower_count}")
+
+#################################################################################################################
+
+############################################################
+## ASHISH- OOPS Assignment:
+############################################################
+
+#Challenge 1:
+
+class Point:
+ def __init__(self):
+  self.x = x
+  self.y = y
+  self.z = z
+
+ def sqSum(self):
+  return ((self.x * self.x)+(self.y * self.y)+(self.z * self.z))
+
+x=int(input("Enter value of x"))
+y=int(input("Enter value of y"))
+z=int(input("Enter value of z"))
+
+p1 = Point(x,y,z)
+print(p1.sqSum())
+
+##################################################################################################################
+
+###Challenge 2: Implement a Calculator Class
+
+class Calculator:
+ def __init__(self):
+ self.num1 = num1
+ self.num2 = num2
+ self.num3 = num3
+
+ def add(self):
+        return (self.num1+self.num2)
+ def subtract(self):
+        return (self.num2-self.num1)
+ def multiply(self):
+        return (self.num1*self.num2)
+ def divide(self):
+        return (self.num2/self.num1)
+
+num1=float(input("Enter value of num1"))
+num2=float(input("Enter value of num2"))
+obj = Calculator(num1, num2)
+print(obj.add())
+print(obj.subtract())
+print(obj.multiply())
+print(obj.divide())
+
+###############################################################################################################
+
+####Challenge 3: Implement the Complete Student Class:
+
+private class Student:
+
+ def __init__(self, Name, RollNumber):
+  self._name = name
+  self._rollNumber = rollNumber
+
+ @setName.setter
+  def setName(self,value):
+  self._name = value
+        
+ 
+  @property #get
+   def getName(self):
+    return self._name
+
+  @setRollNumber.setter
+    def setRollNumber(self,value):
+    self._rollNumber = value
+
+  @property #get
+   def getRollNumber(self):
+    return self._rollNumber
+
+Student1=Student('Ashish',1)
+Student1.setName='Ashish' # Setter
+Student1.setRollNumber=1  # Setter
+print(Student1.getName) # Getter
+print(Student1.getRollNumber) # Getter
+
+###################################################################################################################
+
+##Challenge 4: Implement a Banking Account:
+
+class Account:
+ def __init__(self, title=None, balance=0):
+  self.title = title
+  self.balance = balance
+
+class SavingsAccount(Account):
+ def __init__(self, title=None, balance=0, interestRate=0):
+ super().__init__(title, balance)
+  self.interestRate = interestRate
+
+obj1=Account("Ashish",500)
+obj2=SavingsAccount("Ashish",500,5)
+
+print(obj2.title)
+print(obj2.Balance)
+print(obj2.interestRate)
+
+#########################################################################################################################
+
+##Challenge 5: Handling a Bank Account:
+
+class Account:
+
+ def __init__(self, title=None, balance=0):
+    self.title = title
+    self.balance = balance
+ 
+    def withdrawal(self, amount):
+    self.balance-=amount
+ 
+    def deposit(self, amount):
+    self.balance+=amount
+
+    def getBalance(self):
+    return self.balance
+ 
+class SavingsAccount(Account):
+    def __init__(self, title=None, balance=0, interestRate=0):
+            super().__init__(title, balance)
+
+            self.interestRate = interestRate 
+            def interestAmount(self):
+
+        return (self.interestRate*self.getBalance())/100
+ 
+P1 = SavingsAccount("Ashish", 2000, 5)   
+print(f"Name is {P1.title}")
+print(f"Balance is {P1.getBalance()}")
+
+P1.deposit(500)
+print(f"Balance is {P1.getBalance()}")
+
+P1.withdrawal(100)
+print(f"Balance is: {P1.getBalance()}")
+
+print(f"Interest is:{P1.interestAmount()}")
+
+
+############################################################################################################
+
+
+
