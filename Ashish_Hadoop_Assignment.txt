@@ -1,0 +1,35 @@
+##Problem Statement 01 : Working with HDFS Commands:
+
+1. hdfs dfs -mkdir /dir01
+   hdfs dfs -put input1.txt /dir01
+   hdfs dfs -put input2.txt /dir01
+   hdfs dfs -put input3.txt  /dir01
+
+2. hdfs dfs -ls /dir01
+
+3. hdfs dfs -setrep 5 /dir01
+   hdfs dfs -ls /dir01
+
+
+4. hdfs dfs -mkdir /scenario01
+   hdfs dfs -mkdir /scenario01/level01
+   hdfs dfs -mkdir /scenario01/level01/level02
+   hdfs dfs -put input1.txt /scenario01/
+   hdfs dfs -put input2.txt /scenario01/level01
+   hdfs dfs -put input3.txt /scenario01/level01/level02
+   hdfs dfs -ls /scenario01
+
+################################################################################################################################
+
+##Problem Statement 02 :Working with YARN Commands Commands:
+
+1. yarn jar hadoop-mapreduce-examples.jar wordcount /user/Cloudera/workspace/ /user/cloudera/output_01/
+   (Application id/Job id will also be displayed when above command is run)
+
+2. yarn appliation -kill <applicationId>
+
+3. yarn application -appStates RUNNING -list |grep 'applicationName'
+
+4. yarn logs -applicationId <applicationId> -appOwner <appOwner name> -containerId <containerId>
+
+###################################################################################################################################
