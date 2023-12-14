@@ -1,0 +1,197 @@
+##########Order Data analysis (Joins):
+
+!wget https://archive.apache.org/dist/spark/spark-3.0.0/spark-3.0.0-bin-hadoop2.7.tgz
+!tar -xvzf spark-3.0.0-bin-hadoop2.7.tgz
+!pip install findspark
+
+import os
+os.environ["SPARK_HOME"] = "/content/spark-3.0.0-bin-hadoop2.7"
+import findspark
+findspark.init()
+
+from pyspark.sql import SparkSession
+from pyspark.sql.functions import col
+spark = SparkSession.builder.appName("RetailDataAnalysis").getOrCreate()
+
+
+categories_df = spark.read.csv("categories/part-00000")
+categories_df.show()
+
+customers_df = spark.read.csv("customers/part-00000")
+customers_df.show()
+
+departments_df = spark.read.csv("departments/part-00000")
+departments_df .show()
+
+order_items_df = spark.read.csv("order_items/part-00000")
+order_items_df.show()
+
+orders_df = spark.read.csv("orders/part-00000")
+orders_df.show()
+
+products_df = spark.read.csv("products/part-00000")
+products_df.show()
+
+orders_df = (orders_df.withColumnRenamed("_c0", "order_id").withColumnRenamed("_c1", "order_date").withColumnRenamed("_c2", "order_customer_id").withColumnRenamed("_c3", "order_status"))
+
+
+order_items_df = (order_items_df.withColumnRenamed("_c0", "order_item_id").withColumnRenamed("_c1", "order_item_order_id").withColumnRenamed("_c2", "order_item_product_id").withColumnRenamed("_c3", "order_item_quantity").withColumnRenamed("_c4", "order_item_subtotal").withColumnRenamed("_c5", "order_item_product_price"))
+
+
+products_df = (products_df.withColumnRenamed("_c0", "product_id").withColumnRenamed("_c1", "product_category_id").withColumnRenamed("_c2", "product_name").withColumnRenamed("_c3", "product_description").withColumnRenamed("_c4", "product_price").withColumnRenamed("_c5", "product_image"))
+
+
+
+order_status_count = orders_df.groupBy("order_status").count()
+order_status_count.show()
+
+
+closed_complete_orders_df = orders_df.filter((orders_df["order_status"] == "COMPLETE") | (orders_df["order_status"] == "CLOSED"))
+
+
+joined_df = (
+    products_df.join(order_items_df, products_df["product_id"] == order_items_df["order_item_product_id"], "inner")
+    .join(closed_complete_orders_df, order_items_df["order_item_order_id"] == closed_complete_orders_df["order_id"], "inner")
+)
+
+# Join tables and calculate daily product revenue
+joined_df = (
+    products_df.join(order_items_df, products_df["product_id"] == order_items_df["order_item_product_id"], "inner")
+    .join(closed_complete_orders_df, order_items_df["order_item_order_id"] == closed_complete_orders_df["order_id"], "inner")
+)
+joined_df.show()
+
+
+daily_product_revenue_df = (joined_df.groupBy("order_date", "product_id").agg({"order_item_subtotal": "sum"}).withColumnRenamed("sum(order_item_subtotal)", "daily_product_revenue"))
+daily_product_revenue_df.show()
+
+from pyspark.sql.types import StructType, StructField, TimestampType, StringType, DoubleType
+
+
+schema = StructType([StructField("order_date", TimestampType(), True),StructField("product_name", StringType(), True),StructField("revenue", DoubleType(), True)])
+
+
+from pyspark.sql import SparkSession
+from pyspark.sql.types import StructType, StructField, TimestampType, StringType, DoubleType
+
+
+
+spark = SparkSession.builder.appName("RetailDataAnalysis").enableHiveSupport().getOrCreate()
+
+schema = StructType([StructField("order_date", TimestampType(), True),StructField("product_name", StringType(), True),StructField("revenue", DoubleType(), True)])
+
+
+spark.sql("CREATE TABLE IF NOT EXISTS daily_product_revenue (order_date TIMESTAMP, product_name STRING, revenue DOUBLE)")
+
+
+
+daily_product_revenue_df.write.format("parquet").mode("overwrite").saveAsTable("daily_product_revenue")
+
+daily_product_revenue_df = spark.sql("SELECT * FROM daily_product_revenue")
+
+# Perform queries on the DataFrame
+daily_product_revenue_df.show()
+
+
+###################################################################################################################
+
+###Covid 19 Data analysis assignment:
+
+from pyspark.sql.functions import *
+prop = {'header':True,'infershema':'True','sep':','}
+covid_df = spark.read.options(**prop).csv('country_wise_latest.csv')
+covid_df.show()
+
+new_column_names = ['Country', 'Confirmed', 'Deaths', 'Recovered', 'Active','Newcases', 'Newdeaths', 'Newrecovered', 'Deathsper100Cases','Recoveredper100Cases', 'Deathsper100Recovered', 'Confirmedlastweek','1weekchange', '1weekpercentincrease', 'WHORegion']
+
+covid_df = covid_df.toDF(*new_column_names)
+covid_df.show()
+
+
+for column in covid_df.columns:
+    null_count = covid_df.where(col(column).isNull()).count()
+    print(f"Null count in column '{column}': {null_count}")
+
+
+top_10_countries = covid_df.orderBy(col("Confirmed").desc()).limit(10)
+top_10_countries.show()
+
+bottom_10_countries = covid_df.orderBy(col("Confirmed")).limit(10)
+bottom_10_countries.show()
+
+total_countries = covid_df.select("Country").distinct().count()
+total_who_regions = covid_df.select("WHORegion").distinct().count()
+who_regions_list = covid_df.select("WHORegion").distinct().rdd.flatMap(lambda x: x).collect()
+print(f"Total number of countries: {total_countries}")
+print(f"Total number of WHO regions: {total_who_regions}")
+print(f"List of WHO regions: {who_regions_list}")
+
+
+#####################################################################################################################
+
+##Crime Data Analysis:
+
+
+from pyspark.sql.functions import *
+prop = {'header':True,'infershema':'True','sep':','}
+covid_df = spark.read.options(**prop).csv('country_wise_latest.csv')
+covid_df.show()
+
+from pyspark.sql.functions import *
+prop = {'header':True,'infershema':'True','sep':','}
+crime_incidents_2013_df = spark.read.options(**prop).csv('crime_incidents_2013.csv')
+crime_incidents_2013_df.show()
+
+
+new_column_names = ['Country', 'Confirmed', 'Deaths', 'Recovered', 'Active','Newcases', 'Newdeaths', 'Newrecovered', 'Deathsper100Cases','Recoveredper100Cases', 'Deathsper100Recovered', 'Confirmedlastweek','1weekchange', '1weekpercentincrease', 'WHORegion']
+
+covid_df = covid_df.toDF(*new_column_names)
+covid_df.show()
+
+
+for column in covid_df.columns:
+    null_count = covid_df.where(col(column).isNull()).count()
+    print(f"Null count in column '{column}': {null_count}")
+
+
+top_10_countries = covid_df.orderBy(col("Confirmed").desc()).limit(10)
+top_10_countries.show()
+
+
+bottom_10_countries = covid_df.orderBy(col("Confirmed")).limit(10)
+bottom_10_countries.show()
+
+
+
+total_countries = covid_df.select("Country").distinct().count()
+total_who_regions = covid_df.select("WHORegion").distinct().count()
+who_regions_list = covid_df.select("WHORegion").distinct().rdd.flatMap(lambda x: x).collect()
+print(f"Total number of countries: {total_countries}")
+print(f"Total number of WHO regions: {total_who_regions}")
+print(f"List of WHO regions: {who_regions_list}")
+
+from pyspark.sql.functions import *
+prop = {'header':True,'infershema':'True','sep':','}
+crime_incidents_2013_df = spark.read.options(**prop).csv('crime_incidents_2013.csv')
+crime_incidents_2013_df.show()
+
+
+total_offenses_2013 = crime_incidents_2013_df.count()
+print("Total offenses in 2013:", total_offenses_2013)
+
+
+offense_counts = crime_incidents_2013_df.groupBy("Offense").count()
+print("Crimes committed in each offense:")
+offense_counts.show()
+
+
+shift_max_crimes = crime_incidents_2013_df.groupBy("Shift").count().orderBy(col("count").desc()).first()
+print("Shift with the maximum crimes:", shift_max_crimes["Shift"])
+
+
+homicide_data = crime_incidents_2013_df.filter(col("Offense") == "HOMICIDE")
+method_counts = homicide_data.groupBy("Method").count()
+print("Different methods used in 'Homicide' offense and their count:")
+method_counts.show()
+
+###########################################################################################################################
